@@ -8,9 +8,11 @@ export const login = async (source: string) => {
     }
 }
 
-const spotify_login = async () => {
-    const sdk = SpotifyApi.performUserAuthorization("203577c05742400d956e64c25fbf18c8", 
+const spotify_login = (): SpotifyApi => {
+    
+    const sdk = SpotifyApi.withImplicitGrant("203577c05742400d956e64c25fbf18c8", 
     "http://localhost:3000", 
-    ["user-read-recently-played", "user-library-read", "user-top-read"], 
-    "http://localhost:8080/login/spotify/callback");
+    ["user-read-recently-played", "user-library-read", "user-top-read", "playlist-read-collaborative"], 
+    );
+    return sdk;
 }
