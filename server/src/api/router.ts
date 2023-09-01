@@ -8,7 +8,6 @@ const loginController = new LoginController();
 router.use('/login', loginController.router);
 
 router.get('/', async (req: Request, res: Response) => {
-    console.log(req.query);
     res.status(200).json({'message': 'Wubba Lubba Dub Dub!'});
 });
 

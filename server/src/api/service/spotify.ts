@@ -1,55 +1,49 @@
-import { Request, Response } from 'express';
+import SpotifyWebApi from "spotify-web-api-node";
 import axios, { AxiosResponse } from "axios";
 import randomstring from 'randomstring';
 import * as CONFIG from "../../config";
 
 export default class SpotifyLogin {
 
+    spotifyApi: SpotifyWebApi;
     login_uri: string;
-    scope: string;
+    scopes: Array<string>;
     state: string;
     redirect_uri: string;
 
     constructor() {
-        this.login_uri = process.env.SPOTIFY_LOGIN_URI || '';
-        this.scope = `user-read-playback-state user-read-currently-playing user-library-read user-top-read`;
-        this.redirect_uri = 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/login/spotify/callback';
+        this.spotifyApi = new SpotifyWebApi({
+            redirectUri: 'http://' + CONFIG.HOST + ':' + CONFIG.PORT + '/login/spotify/callback',
+            clientId: process.env.SPOTIFY_CLIENT_ID
+        });
+        this.scopes = ['user-read-playback-state', 'user-library-read', 'user-top-read'];
     }
 
-    public login(req: Request, res: Response) {
+    public login_details() {
         this.state = randomstring.generate(16);
-        const searchParams = new URLSearchParams({
-            response_type: 'code',
-            client_id: process.env.SPOTIFY_CLIENT_ID,
-            scope: this.scope,
-            redirect_uri: this.redirect_uri,
-            state: this.state,
-        })
-        res.redirect(this.login_uri + 'authorize?' + searchParams.toString());
+        const authorizeURL = this.spotifyApi.createAuthorizeURL(this.scopes, this.state, true);
+        return { 'login_uri': authorizeURL };
     }
 
-    public async login_callback(req: Request, res: Response) {
-        console.log(req.query.code)
-        const code = (String)(req.query.code);
-        const token = await this.get_access_token(code);
-        if (token != "") {
-            res.status(200).json({'token': token});
-        } else {
-            res.status(500).json({'error': 'Could not get access token.'});
-        }
-    }
-
-    private async get_access_token(code: string): Promise<string> {
-        const body = {
+    public async get_access_token(code: string): Promise<string> {
+        const body = new URLSearchParams({
             grant_type: 'authorization_code',
             code: code,
             redirect_uri: this.redirect_uri,
             client_id: process.env.SPOTIFY_CLIENT_ID,
             client_secret: process.env.SPOTIFY_CLIENT_SECRET
-        }
+        })
         const url = this.login_uri + 'api/token'
-        const response: AxiosResponse = await axios.post(url, body);
-        console.log(response.data);
+        const response: AxiosResponse = await axios.post(url, body.toString(),
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json'
+                }
+            });
+        if (response.status != 200) {
+            return Promise.resolve("");
+        }
         return response.data.access_token;
     }
 }
