@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { withRouter } from "../utils/WithRouter";
 
 const Router: React.FC = () => {
+
   return (
     <Routes>
       <Route path="/about" element={<About/>} />

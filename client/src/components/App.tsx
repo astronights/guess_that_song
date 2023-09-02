@@ -1,18 +1,21 @@
-import React from 'react';
-import { GlobalStateProvider } from "../utils/GlobalStateProvider";
-import Layer from './Layer';
-import { login } from '../api/login'
+import { createTheme, ThemeProvider } from "@mui/material";
+import "../assets/css/app.sass";
+import Layer from "./Layer";
 
-function App() {
-  login('spotify')
-  
+const App = () => {
+  const darkTheme = createTheme({
+    palette: {
+      mode: "dark",
+    },
+  });
+
   return (
-    <div className="App">
-      <GlobalStateProvider>
+    <ThemeProvider theme={darkTheme}>
+      <div className="app">
         <Layer />
-      </GlobalStateProvider>
-    </div>
+      </div>
+    </ThemeProvider>
   );
-}
+};
 
 export default App;

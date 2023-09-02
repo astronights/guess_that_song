@@ -1,10 +1,11 @@
-import React from "react";
 import NavBar from "./NavBar";
 import Router from "./Router";
+import "../assets/css/layer.sass"
 
 const Layer = () => {
+
   return (
-    <div>
+    <div className={`layer`}> 
       <NavBar />
       <Router />
     </div>

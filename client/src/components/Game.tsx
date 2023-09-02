@@ -1,7 +1,19 @@
-import React from "react";
+interface GameProps {
+  game?: {
+    custom?: Array<string>
+    id?: string
+  }
+  user?: string
+}
 
-const Game = () => {
-  return <div>Game</div>;
+const Game = (props: GameProps) => {
+    const user = props.user || window.sessionStorage.getItem("user");
+    return (
+      <div>
+        <div>Game</div>
+        <div>{user}</div>
+      </div>
+    );
 };
 
 export default Game;
