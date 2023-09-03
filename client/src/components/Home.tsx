@@ -108,12 +108,23 @@ const Home = () => {
 
     if (playlist === 'recent') {
       props['tracks'] = info.user.recentlyPlayed
+      props['type'] = 'recent'
     } else if (playlist === 'top') {
       props['tracks'] = info.user.topTracks
+      props['type'] = 'top'
     } else if (playlist === '') {
       props['gameCode'] = gameCode
+      props['type'] = 'existing'
     } else {
-      props['playlist'] = playlist
+      if (info.charts.find((cur) => cur.id === playlist) !== undefined) {
+        props['playlist'] = info.charts.find((cur) => cur.id === playlist)
+        props['type'] = 'global'
+      } else if (info.user.playlists.find((cur) => cur.id === playlist) !== undefined) {
+        props['playlist'] = info.user.playlists.find((cur) => cur.id === playlist)
+        props['type'] = 'personal'
+      } else {
+        props['type'] = 'error'
+      }
     }
     console.log(props)
     return <Navigate to='/game' state={props} />
@@ -145,10 +156,10 @@ const Home = () => {
           <Grid>
             <Card className='my-playlists' variant="outlined">
               <List component="nav">
-                  <ListItem>
-                    <ListItemIcon><QueueMusicIcon /></ListItemIcon>
-                    <ListItemText primary="My Playlists" />
-                  </ListItem>
+                <ListItem>
+                  <ListItemIcon><QueueMusicIcon /></ListItemIcon>
+                  <ListItemText primary="My Playlists" />
+                </ListItem>
               </List>
               <Divider />
               {loading ? <Skeleton variant='rounded' height={'45vh'} /> : (
@@ -235,20 +246,20 @@ const Home = () => {
                 </ListItem>
               </List>
               <Divider />
-              { loading ? <Skeleton variant='rounded' height={'80vh'} /> : (
-              <List component="nav" sx={{ maxHeight: '80vh', overflow: 'auto' }}>
-                {info.charts.map((cur) => {
-                  return (
-                    <ListItemButton key={cur.id} selected={cur.id === playlist}
-                      onClick={(event) => handleListItemClick(event, cur.id)}>
-                      <ListItemAvatar>
-                        <Avatar alt={cur.name} src={cur.images[0].url} />
-                      </ListItemAvatar>
-                      <ListItemText primary={cur.name} />
-                    </ListItemButton>
-                  )
-                })}
-              </List>
+              {loading ? <Skeleton variant='rounded' height={'80vh'} /> : (
+                <List component="nav" sx={{ maxHeight: '80vh', overflow: 'auto' }}>
+                  {info.charts.map((cur) => {
+                    return (
+                      <ListItemButton key={cur.id} selected={cur.id === playlist}
+                        onClick={(event) => handleListItemClick(event, cur.id)}>
+                        <ListItemAvatar>
+                          <Avatar alt={cur.name} src={cur.images[0].url} />
+                        </ListItemAvatar>
+                        <ListItemText primary={cur.name} />
+                      </ListItemButton>
+                    )
+                  })}
+                </List>
               )}
             </Card>
           </Grid>
