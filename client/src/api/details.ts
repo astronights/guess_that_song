@@ -1,5 +1,5 @@
 import { SpotifyApi } from '@spotify/web-api-ts-sdk';
-import { user, chart, data } from '../types/music';
+import { data } from '../types/music';
 import { playlist_ids } from '../assets/constants';
 
 export const login = async (source: string) => {
@@ -16,27 +16,40 @@ const spotify_login = async (): Promise<data> => {
         process.env.REACT_APP_REDIRECT_URI,
         ["user-read-recently-played", "user-library-read", "user-top-read", "playlist-read-collaborative"],
     );
-    return { sdk: sdk, user: await getUserDetails(sdk), charts: await getCharts(sdk) };
+    return { sdk: sdk, ...(await getDetails(sdk)) };
 
 }
 
-const getUserDetails = async (sdk: SpotifyApi): Promise<user> => {
+const getDetails = async (sdk: SpotifyApi): Promise<data> => {
     const data = {
-        id: (await sdk.currentUser.profile()).id,
-        playlists: (await sdk.currentUser.playlists.playlists()).items,
-        recentlyPlayed: (await sdk.player.getRecentlyPlayedTracks(50, {timestamp: 100000, type: 'after'})).items,
-        topTracks: (await sdk.currentUser.topItems('tracks')).items,
-        topArtists: (await sdk.currentUser.topItems('artists')).items,
+        user: {
+            id: (await sdk.currentUser.profile()).id,
+            playlists: [],
+            playlistRefs: (await sdk.currentUser.playlists.playlists()).items,
+            recentlyPlayed: (await sdk.player.getRecentlyPlayedTracks(50, { timestamp: 100000, type: 'after' })).items,
+            topTracks: (await sdk.currentUser.topItems('tracks')).items,
+            // topArtists: (await sdk.currentUser.topItems('artists')).items,
+        },
+        charts: []
+    }
+    for (const playlist_id of playlist_ids) {
+        const playlist = (await sdk.playlists.getPlaylist(playlist_id));
+        data.charts.push(playlist)
     };
-    return data;
-}
-
-const getCharts = async (sdk: SpotifyApi): Promise<chart> => {
-    const charts = []
-    playlist_ids.forEach(async (id) => {
-        sdk.playlists.getPlaylist(id).then((playlist) => {
-            charts.push(playlist);
+    for (const playlist of data.user.playlistRefs) {
+        if (playlist_ids.includes(playlist.id)) continue;
+        const items = (await sdk.playlists.getPlaylist(playlist.id)).tracks;
+        data.user.playlists.push({
+            id: playlist.id,
+            images: playlist.images,
+            owner: playlist.owner,
+            type: playlist.type,
+            uri: playlist.uri,
+            name: playlist.name,
+            description: playlist.description,
+            tracks: items
         });
-    });
-    return charts;
+    };
+    delete data.user.playlistRefs;
+    return data;
 }

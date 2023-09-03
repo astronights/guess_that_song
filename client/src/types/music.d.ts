@@ -2,7 +2,7 @@ import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 
 export type user = {
     id: string;
-    playlists: SpotifyApi.SimplifiedPlaylist[];
+    playlists: SpotifyApi.Playlist[];
     topArtists?: SpotifyApi.Artist[];
     topTracks?: SpotifyApi.Track[];
     recentlyPlayed: SpotifyApi.PlayHistoryItem[];
