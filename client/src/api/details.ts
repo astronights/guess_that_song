@@ -30,10 +30,11 @@ const getUserDetails = async (sdk: SpotifyApi): Promise<user> => {
 }
 
 const getCharts = async (sdk: SpotifyApi): Promise<chart> => {
-    const charts = {
-        playlists: await Promise.all(playlist_ids.map(async (id) => {
-            return await sdk.playlists.getPlaylist(id);
-        }))
-    }
+    const charts = []
+    playlist_ids.forEach(async (id) => {
+        sdk.playlists.getPlaylist(id).then((playlist) => {
+            charts.push(playlist);
+        });
+    });
     return charts;
 }

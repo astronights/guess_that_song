@@ -23,22 +23,11 @@ const NavBar = () => {
             Guess That Song 🎧
           </span>
         </NavLink>
-        <NavLink className={(isActive) =>
-            "nav-link" + (!isActive.isActive ? "" : "-active")} 
-            to="/home">
-          Home
-        </NavLink>
-        {user && 
-        <NavLink className={(isActive) =>
-            "nav-link" + (!isActive.isActive ? "" : "-active")}
-           to="/game">
-        Game
-      </NavLink>}
-      <NavLink className={(isActive) =>
-            "nav-link" + (!isActive.isActive ? "" : "-active")}
-             to="/about">
-        About
-      </NavLink>
+        {["home", "game", "about"].map((text, index) => (
+          <NavLink key={text} className="nav-link" to={"/" + text}>
+            {text.charAt(0).toUpperCase() + text.slice(1)}
+          </NavLink>
+        ))}
     </Toolbar>
     </AppBar >
   );

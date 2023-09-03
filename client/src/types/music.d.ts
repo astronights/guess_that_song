@@ -8,12 +8,10 @@ export type user = {
     recentlyPlayed: SpotifyApi.PlayHistoryItem[];
   };
 
-export type chart = {
-    playlists: SpotifyApi.Playlist[];
-};
+export type chart = SpotifyApi.Playlist[];
 
 export type data = {
     sdk?: SpotifyApi;
     user: user;
-    charts: charts;
+    charts: SpotifyApi.Playlist[];
 };

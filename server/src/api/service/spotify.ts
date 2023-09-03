@@ -6,7 +6,7 @@ export default class SpotifyLogin {
 
     public async login(access_token: AccessToken): Promise<any> {
         this.spotifyApi = SpotifyApi.withAccessToken(process.env.SPOTIFY_CLIENT_ID, access_token);
-        console.log(await this.spotifyApi.currentUser.profile())
-        return this.spotifyApi.currentUser.profile()
+        console.log(await this.spotifyApi.currentUser.topItems())
+        return this.spotifyApi.currentUser.topItems();
     }
 }

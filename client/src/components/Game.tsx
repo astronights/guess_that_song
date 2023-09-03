@@ -11,6 +11,7 @@ const Game = (props: GameProps) => {
     return (
       <div>
         <div>Game</div>
+        <div>Work in Progress</div>
         <div>{user}</div>
       </div>
     );
