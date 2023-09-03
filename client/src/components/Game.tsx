@@ -9,12 +9,12 @@ interface GameState {
 
 const Game = () => {
 
-    const { state } = useLocation();
-    const gameRef: GameState = state;
-    return (
-      <div className="page">
-        </div>
-    );
+  const { state } = useLocation();
+  const gameRef: GameState = state;
+  return (
+    <div className="page">
+    </div>
+  );
 };
 
 export default Game;

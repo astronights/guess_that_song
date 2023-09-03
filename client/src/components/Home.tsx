@@ -6,7 +6,7 @@ import "../assets/css/page.sass";
 import "../assets/css/home.sass";
 import {
   List, ListItemButton, ListItemText, Divider, Avatar, ListItemAvatar,
-  Card, ListItem, ListItemIcon, Button, Stack, Chip, Snackbar, Alert, TextField
+  Card, ListItem, ListItemIcon, Button, Stack, Chip, Snackbar, Alert, TextField, Skeleton
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
@@ -42,12 +42,14 @@ const Home = () => {
   const [message, setMessage] = useState("");
   const [gameCode, setGameCode] = useState("");
   const [redirect, setRedirect] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     login('spotify').then((details: data) => {
       setInfo(details);
       console.log(details);
       window.sessionStorage.setItem("user", details.user.id);
+      setLoading(false);
     });
   }, []);
 
@@ -131,56 +133,64 @@ const Home = () => {
         <Grid container xs={12} md={6} direction={'column'} spacing={1.3}>
           <Grid>
             <Card variant="outlined" className="display-name">
-              <ListItem>
-                <ListItemIcon><FaceIcon /></ListItemIcon>
-                <ListItemText primary={`Hello ${info.user.id} !`} />
-              </ListItem>
+              {loading ? <Skeleton variant='rounded' height={'10vh'} /> :
+                <ListItem>
+                  <ListItemIcon><FaceIcon /></ListItemIcon>
+                  <ListItemText primary={`Hello ${info.user.id} !`} />
+                </ListItem>
+              }
             </Card>
           </Grid>
 
           <Grid>
             <Card className='my-playlists' variant="outlined">
               <List component="nav">
-                <ListItem>
-                  <ListItemIcon><QueueMusicIcon /></ListItemIcon>
-                  <ListItemText primary="My Playlists" />
-                </ListItem>
+                  <ListItem>
+                    <ListItemIcon><QueueMusicIcon /></ListItemIcon>
+                    <ListItemText primary="My Playlists" />
+                  </ListItem>
               </List>
               <Divider />
-              <List component="nav" sx={{ maxHeight: '50vh', overflow: 'auto' }}>
-                {info.user.playlists.map((cur) => {
-                  return (
-                    <ListItemButton key={cur.id} selected={cur.id === playlist}
-                      onClick={(event) => handleListItemClick(event, cur.id)}>
-                      <ListItemAvatar>
-                        <Avatar alt={cur.name} src={cur.images[0].url} />
-                      </ListItemAvatar>
-                      <ListItemText primary={cur.name} />
-                    </ListItemButton>
-                  )
-                })}
-              </List>
+              {loading ? <Skeleton variant='rounded' height={'45vh'} /> : (
+                <List component="nav" sx={{ maxHeight: '45vh', overflow: 'auto' }}>
+                  {info.user.playlists.map((cur) => {
+                    return (
+                      <ListItemButton key={cur.id} selected={cur.id === playlist}
+                        onClick={(event) => handleListItemClick(event, cur.id)}>
+                        <ListItemAvatar>
+                          <Avatar alt={cur.name} src={cur.images[0].url} />
+                        </ListItemAvatar>
+                        <ListItemText primary={cur.name} />
+                      </ListItemButton>
+                    )
+                  })}
+                </List>
+              )}
             </Card>
           </Grid>
 
           <Grid container spacing={1.5} >
             <Grid sx={{ width: '50%' }}>
               <Card className='recently-played' variant="outlined">
-                <ListItemButton key='recent' selected={'recent' === playlist}
-                  onClick={(event) => handleListItemClick(event, 'recent')}>
-                  <ListItemIcon><HeadphonesIcon /></ListItemIcon>
-                  <ListItemText primary={`Recently Played (${info.user.recentlyPlayed.length})`} />
-                </ListItemButton>
+                {loading ? <Skeleton variant='rounded' height={'10vh'} /> : (
+                  <ListItemButton key='recent' selected={'recent' === playlist}
+                    onClick={(event) => handleListItemClick(event, 'recent')}>
+                    <ListItemIcon><HeadphonesIcon /></ListItemIcon>
+                    <ListItemText primary={`Recently Played (${info.user.recentlyPlayed.length})`} />
+                  </ListItemButton>
+                )}
               </Card>
             </Grid>
 
             <Grid sx={{ width: '50%' }}>
               <Card className='top-tracks' variant="outlined">
-                <ListItemButton key='recent' selected={'top' === playlist}
-                  onClick={(event) => handleListItemClick(event, 'top')}>
-                  <ListItemIcon><EqualizerIcon /></ListItemIcon>
-                  <ListItemText primary={`Top Tracks (${info.user.topTracks.length})`} />
-                </ListItemButton>
+                {loading ? <Skeleton variant='rounded' height={'10vh'} /> : (
+                  <ListItemButton key='recent' selected={'top' === playlist}
+                    onClick={(event) => handleListItemClick(event, 'top')}>
+                    <ListItemIcon><EqualizerIcon /></ListItemIcon>
+                    <ListItemText primary={`Top Tracks (${info.user.topTracks.length})`} />
+                  </ListItemButton>
+                )}
               </Card>
             </Grid>
 
@@ -221,10 +231,11 @@ const Home = () => {
               <List component="nav">
                 <ListItem>
                   <ListItemIcon><LibraryMusicIcon /></ListItemIcon>
-                  <ListItemText primary="Popular Playlists" />
+                  <ListItemText primary="Global Playlists" />
                 </ListItem>
               </List>
               <Divider />
+              { loading ? <Skeleton variant='rounded' height={'80vh'} /> : (
               <List component="nav" sx={{ maxHeight: '80vh', overflow: 'auto' }}>
                 {info.charts.map((cur) => {
                   return (
@@ -238,6 +249,7 @@ const Home = () => {
                   )
                 })}
               </List>
+              )}
             </Card>
           </Grid>
         </Grid>
