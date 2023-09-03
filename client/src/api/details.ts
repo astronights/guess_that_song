@@ -12,8 +12,8 @@ export const login = async (source: string) => {
 
 const spotify_login = async (): Promise<data> => {
     const sdk = SpotifyApi.withImplicitGrant(
-        "203577c05742400d956e64c25fbf18c8",
-        "http://localhost:3000",
+        process.env.REACT_APP_CLIENT_ID,
+        process.env.REACT_APP_REDIRECT_URI,
         ["user-read-recently-played", "user-library-read", "user-top-read", "playlist-read-collaborative"],
     );
     return { sdk: sdk, user: await getUserDetails(sdk), charts: await getCharts(sdk) };
