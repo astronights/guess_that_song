@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import { Navigate } from "react-router-dom";
 import { login } from '../api/details'
 import { data } from "../types/music";
 import "../assets/css/page.sass";
 import "../assets/css/home.sass";
 import {
   List, ListItemButton, ListItemText, Divider, Avatar, ListItemAvatar,
-  Card, ListItem, ListItemIcon, Button, Stack, Chip
+  Card, ListItem, ListItemIcon, Button, Stack, Chip, Snackbar, Alert, TextField
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
@@ -38,6 +39,9 @@ const Home = () => {
 
   const [info, setInfo] = useState(music_info);
   const [playlist, setPlayList] = useState("");
+  const [message, setMessage] = useState("");
+  const [gameCode, setGameCode] = useState("");
+  const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
     login('spotify').then((details: data) => {
@@ -74,8 +78,55 @@ const Home = () => {
     }
   }
 
+  const loadGame = () => {
+    if (playlist === '') {
+      if (gameCode === '') {
+        setMessage('Please select a playlist or enter a room code')
+      }
+      else {
+        setRedirect(true);
+      }
+      setMessage('Please select a playlist')
+    } else {
+      setRedirect(true);
+    }
+  }
+
+  const handleGameCode = (event) => {
+    if (event.target.value.length === 6) {
+      setGameCode(event.target.value);
+    }
+    else {
+      setGameCode('');
+    }
+  }
+
+  if (redirect) {
+    const props = {user: info.user.id}
+
+    if (playlist === 'recent') {
+      props['tracks'] = info.user.recentlyPlayed
+    } else if (playlist === 'top') {
+      props['tracks'] = info.user.topTracks
+    } else if (playlist === '') {
+      props['gameCode'] = gameCode
+    } else {
+      props['playlist'] = playlist
+    }
+    console.log(props)
+    return <Navigate to='/game' state={props} />
+  };
+
   return (
     <div className="page">
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={message !== ''}
+        autoHideDuration={6000}
+        onClose={() => setMessage('')}
+      >
+        <Alert onClose={() => setMessage('')} severity="warning" sx={{ width: '100%' }}>{message}</Alert>
+      </Snackbar>
       <Grid container spacing={1.3}>
         <Grid container xs={12} md={6} direction={'column'} spacing={1.3}>
           <Grid>
@@ -139,8 +190,8 @@ const Home = () => {
         <Grid container xs={12} md={6} direction={'column'} spacing={1.5}>
           <Grid>
             <Card className='choice' variant="outlined">
-              <ListItem>
-              <ListItemText primary='Game Playlist: ' sx={{minWidth: '25%'}} />
+              <ListItem alignItems='flex-start' sx={{ display: 'flex' }}>
+                <ListItemText primary='Game Playlist: ' sx={{ minWidth: '25%' }} />
                 {
                   playlist !== '' ?
                     <Chip label={getChoice(playlist)}
@@ -149,10 +200,17 @@ const Home = () => {
                 }
               </ListItem>
               <ListItem>
-              <Stack spacing={2} direction="row">
-                  <Button variant="outlined">Create Room</Button>
-                  <Button variant="outlined">Join Room</Button>
-                  <Button variant="outlined">Play Global</Button>
+                <ListItemText primary='Room Code: ' sx={{ minWidth: '25%' }} />
+                <TextField id="outlined-basic" size='small' onChange={handleGameCode}
+                  label="6 digit code" variant="outlined" />
+              </ListItem>
+              <ListItem>
+                <Stack spacing={2} direction="row">
+                  <Button variant="outlined" onClick={loadGame}>Create Room</Button>
+                  <Button variant="outlined" onClick={loadGame} disabled={gameCode === ''}>Join Room</Button>
+                  <Button variant="outlined" onClick={loadGame} disabled={
+                    playlist === '' || info.charts.find((cur) => cur.id === playlist) === undefined
+                  }>Play Global</Button>
                 </Stack>
               </ListItem>
 
