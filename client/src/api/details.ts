@@ -24,7 +24,9 @@ const getUserDetails = async (sdk: SpotifyApi): Promise<user> => {
     const data = {
         id: (await sdk.currentUser.profile()).id,
         playlists: (await sdk.currentUser.playlists.playlists()).items,
-        recentlyPlayed: (await sdk.player.getRecentlyPlayedTracks()).items
+        recentlyPlayed: (await sdk.player.getRecentlyPlayedTracks(50, {timestamp: 100000, type: 'after'})).items,
+        topTracks: (await sdk.currentUser.topItems('tracks')).items,
+        topArtists: (await sdk.currentUser.topItems('artists')).items,
     };
     return data;
 }
