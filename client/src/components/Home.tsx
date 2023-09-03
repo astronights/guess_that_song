@@ -5,14 +5,13 @@ import "../assets/css/page.sass";
 import "../assets/css/home.sass";
 import {
   List, ListItemButton, ListItemText, Divider, Avatar, ListItemAvatar,
-  Card, ListItem, ListItemIcon, Typography, CardContent, Button, Stack
+  Card, ListItem, ListItemIcon, Button, Stack, Chip
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
 import HeadphonesIcon from '@mui/icons-material/Headphones';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import FaceIcon from '@mui/icons-material/Face';
-import AudiotrackIcon from '@mui/icons-material/Audiotrack';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
 
 const music_info: data = {
@@ -137,11 +136,17 @@ const Home = () => {
           </Grid>
         </Grid>
 
-        <Grid container xs={12} md={6} direction={'column'}>
+        <Grid container xs={12} md={6} direction={'column'} spacing={1.5}>
           <Grid>
             <Card className='choice' variant="outlined">
               <ListItem>
-                <ListItemText primary={`Game Playlist: ${getChoice(playlist)}`} />
+              <ListItemText primary='Game Playlist: ' sx={{minWidth: '25%'}} />
+                {
+                  playlist !== '' ?
+                    <Chip label={getChoice(playlist)}
+                      variant="outlined" onDelete={() => { setPlayList('') }} />
+                    : null
+                }
               </ListItem>
               <ListItem>
               <Stack spacing={2} direction="row">
