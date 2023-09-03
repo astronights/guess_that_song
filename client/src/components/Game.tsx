@@ -12,11 +12,8 @@ const Game = () => {
     const { state } = useLocation();
     const gameRef: GameState = state;
     return (
-      <div>
-        <div>Game</div>
-        <div>Work in Progress</div>
-        <div>{JSON.stringify(gameRef)}</div>
-      </div>
+      <div className="page">
+        </div>
     );
 };
 

@@ -102,7 +102,7 @@ const Home = () => {
   }
 
   if (redirect) {
-    const props = {user: info.user.id}
+    const props = { user: info.user.id }
 
     if (playlist === 'recent') {
       props['tracks'] = info.user.recentlyPlayed
